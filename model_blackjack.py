@@ -1,0 +1,2 @@
+DENAR = 0   
+STAVA = 0
