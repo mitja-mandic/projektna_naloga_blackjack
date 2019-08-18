@@ -28,15 +28,25 @@ class Kup:
 
     def __repr__(self):
         return f'{self.kup}'
-
+ZMEŠAN_KUP = Kup().zmešaj()
 class Igralec:
-    def __init__(self):
+    def __init__(self, ime):
         self.roka = []
-    def hit(self):
-        self.roka.append(Kup().zmešaj()[1])
+        self.ime = ime
+    
+    def __repr__(self):
+        return f'{self.ime}, {self.roka}'
 
-    def __str__(self):
-        return f'igralec, {self.roka}'
-m = Igralec()
-m.hit()
-print(str(m))
+
+    def deal(self):
+        že_podeljene = []
+        for karta in ZMEŠAN_KUP:
+            if len(self.roka) < 2 and karta not in že_podeljene :
+                self.roka.append(karta)
+                že_podeljene.append(karta)
+            else:
+                continue
+        for karta in že_podeljene:
+            ZMEŠAN_KUP.remove(karta)
+        return ZMEŠAN_KUP
+        return self.roka
