@@ -9,7 +9,6 @@ class Karta:
     def __init__(self, barva, stevilo):
         self.barva = barva
         self.stevilo = stevilo
-        
 
     def __repr__(self):
         return f'Karta({self.barva}, {self.stevilo})'
@@ -32,20 +31,22 @@ class Igra:
         self.dealer = []
         self.roka1 = []
         self.roka2 = []
+        self.znesek = 0
         self.kup = Kup().zmešaj()
     
-    def stava(self, znesek=10):
-        global STAVA, DENAR
+    def stava(self, znesek):
+        global DENAR
         if znesek <= DENAR and znesek != 0:
-            STAVA += znesek
             DENAR -= znesek
+            self.znesek += znesek
             return True
         else:
-            return False
+            return False 
 
     def deal(self):
         že_podeljene = []    
-        if self.stava():
+        
+        if self.stava:
             for karta in self.kup:
                 if len(self.roka1) < 2 and karta not in že_podeljene :
                     self.roka1.append(karta)
@@ -55,14 +56,15 @@ class Igra:
                     že_podeljene.append(karta)
                 else:
                     continue
-            for karta in že_podeljene:
-                self.kup.remove(karta)
         else:
-            print('Nisi stavil. Pred vsako karto je potrebno staviti.')
-
+            print('stavi')
+        for karta in že_podeljene:
+            self.kup.remove(karta)
+        
     def hit(self, igralec):
-        igralec.append(self.kup[0])
-        self.kup.remove(igralec[-1])
+        if self.stava:
+            igralec.append(self.kup[0])
+            self.kup.remove(igralec[-1])
 
     def doloci_vrednost_roke(self, igralec):    
         vrednost = 0
@@ -82,11 +84,18 @@ class Igra:
         else:
             pass
         
+    def konec_igre(self):
+        global DENAR
+        if self.doloci_vrednost_roke(self.roka1) > 21 or self.doloci_vrednost_roke(self.dealer) == 21:
+            return PORAZ
+        elif self.doloci_vrednost_roke(self.dealer) > 21 or self.doloci_vrednost_roke(self.roka1) == 21:
+            DENAR += self.znesek
+            return ZMAGA
+        elif DENAR == 0:
+            return PORAZ
 
     def __repr__(self):
-        return f'{self.roka1},{self.doloci_vrednost_roke(self.roka1)},{DENAR, STAVA}'
+        return f'{self.roka1},{self.dealer},{self.znesek},{DENAR}'
 
-m = Igra()
-m.stava(130)
-m.deal()
-print(repr(m))
+def nova_igra():
+    return Igra()
