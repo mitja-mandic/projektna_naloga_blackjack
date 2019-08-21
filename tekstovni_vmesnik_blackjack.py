@@ -2,7 +2,8 @@ import model_blackjack
 lojtrice = "######################################\n"
 
 def izpis_zmage(igra):
-    tekst = lojtrice + 'Zmagali ste. Imate {0} denarja'.format(model_blackjack.DENAR)
+
+    tekst = lojtrice + 'Zmagali ste. Imate {0} žetonov'.format(model_blackjack.DENAR)
     return tekst
 
 def izpis_poraza(igra):
@@ -10,8 +11,8 @@ def izpis_poraza(igra):
     return tekst
 
 def izpis_igre(igra):
-    tekst = lojtrice + ('''V roki imate {0} in vsota vrednosti vaših kart je {1} \n dealer ima v roki 
-    {2} \n imate še {3}''').format(igra.roka1, igra.doloci_vrednost_roke(roka1), igra.dealer[0], model_blackjack.DENAR)
+    tekst = lojtrice + ('''V roki imate {0} in vsota vrednosti vaših kart je {1} \ndealer ima v roki 
+    {2} \n imate še {3}''').format(igra.roka1, igra.doloci_vrednost_roke(igra.roka1), igra.dealer, model_blackjack.DENAR)
     return tekst
 
 def pozeni_vmesnik():
@@ -49,4 +50,6 @@ def pozeni_vmesnik():
         else:
             igra.stava(nova_stava)
     return None
+
+
 pozeni_vmesnik()
