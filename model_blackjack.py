@@ -1,9 +1,10 @@
 import random
 DENAR = 100   
-STAVA = 0
 BARVE = ['Srca', 'Kara', 'Pik', 'Križ']
-ZMAGA = 'w'
-PORAZ = 'x'
+ZMAGA = 'wW'
+PORAZ = 'xx'
+ZMAGA_RUNDE = 'w'
+PORAZ_RUNDE = 'x'
 
 class Karta:
     def __init__(self, barva, stevilo):
@@ -30,8 +31,8 @@ class Igra:
     def __init__(self):
         self.dealer = []
         self.roka1 = []
-        self.roka2 = []
         self.znesek = 0
+        self.vrednost_roke = 0
         self.kup = Kup().zmešaj()
     
     def stava(self, znesek):
@@ -56,8 +57,6 @@ class Igra:
                     že_podeljene.append(karta)
                 else:
                     continue
-        else:
-            print('stavi')
         for karta in že_podeljene:
             self.kup.remove(karta)
         
@@ -67,35 +66,56 @@ class Igra:
             self.kup.remove(igralec[-1])
 
     def doloci_vrednost_roke(self, igralec):    
-        vrednost = 0
+        self.vrednost_roke = 0
         for karta in igralec:
             if karta.stevilo not in range(2,11) and karta.stevilo != 'A':
-                vrednost += 10
+                self.vrednost_roke += 10
             elif karta.stevilo == 'A':
-                vrednost += 1
+                self.vrednost_roke += 1
             else:
-                vrednost += karta.stevilo
-        return vrednost
+                self.vrednost_roke += karta.stevilo
+        return self.vrednost_roke
 
     def dealers_play(self):
-        if self.doloci_vrednost_roke(self.dealer) <= 16:
+        while self.doloci_vrednost_roke(self.dealer) <= 16:
             self.dealer.append(self.kup[0])
             self.kup.remove(self.dealer[-1])
         else:
             pass
-        
+
+    def soft_hand(self):
+        for karta in self.roka1:
+            if karta.stevilo == 'A':
+                self.vrednost_roke += 10
+
+
     def konec_igre(self):
         global DENAR
-        if self.doloci_vrednost_roke(self.roka1) > 21 or self.doloci_vrednost_roke(self.dealer) == 21:
+        if DENAR == 0:
             return PORAZ
+        elif DENAR == 300:
+            return ZMAGA
+        elif self.doloci_vrednost_roke(self.roka1) > 21 or self.doloci_vrednost_roke(self.dealer) == 21:
+            DENAR -= self.znesek
+            return PORAZ_RUNDE
         elif self.doloci_vrednost_roke(self.dealer) > 21 or self.doloci_vrednost_roke(self.roka1) == 21:
             DENAR += self.znesek
-            return ZMAGA
-        elif DENAR == 0:
-            return PORAZ
+            return ZMAGA_RUNDE
+        elif 16 < self.doloci_vrednost_roke(self.dealer) < 21 and 16 < self.doloci_vrednost_roke(self.roka1) < 21:
+            if self.doloci_vrednost_roke(self.roka1) < self.doloci_vrednost_roke(self.dealer):
+                DENAR -= self.znesek
+                return PORAZ_RUNDE
+            else:
+                DENAR += self.znesek
+                return ZMAGA_RUNDE
 
+    def reset(self):
+        self.dealer = []
+        self.roka1 = []
+        self.kup = Kup().zmešaj()
     def __repr__(self):
-        return f'{self.roka1},{self.dealer},{self.znesek},{DENAR}'
+        return f'{self.znesek}'
+    #return f'{self.roka1},{self.dealer},{self.doloci_vrednost_roke(self.roka1)},{self.doloci_vrednost_roke(self.dealer)}'
 
 def nova_igra():
     return Igra()
