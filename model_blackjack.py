@@ -80,6 +80,7 @@ class Igra:
         for i, s in enumerate(self.roka1):
             if s.stevilo == 'A':
                 self.roka1[i] = Karta(barva=s.barva,stevilo = 11)
+                #print('menjam as za 11')
             return self.roka1
 
     def dealers_play(self):
@@ -133,11 +134,11 @@ class Igra:
         return f'{self.roka1}, {self.doloci_vrednost_roke(self.roka1)}'
     #return f'{self.roka1},{self.dealer},{self.doloci_vrednost_roke(self.roka1)},{self.doloci_vrednost_roke(self.dealer)}'
 
-m = Igra()
-m.deal()
-print(m)
-m.soft_hand()
-print(m)
+#m = Igra()
+#m.deal()
+#print(m)
+#m.soft_hand()
+#print(m)
 
 
 def nova_igra():

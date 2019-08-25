@@ -30,7 +30,9 @@ def izpis_zmage_runde(igra):
     tekst = lojtrice + 'Čestitamo, ta krog ste zmagali. V roki ste imeli {0},\ndealer pa {1}. Na računu imate sedaj {2}.'.format(igra.roka1, igra.dealer, model_blackjack.DENAR)
     return tekst
 
-
+def trenutno_stanje(igra):
+    tekst = lojtrice + f'V roki imate {igra.roka1}.'
+    return tekst
 
 def pozeni_vmesnik():
     
@@ -38,52 +40,62 @@ def pozeni_vmesnik():
     igra.deal()
 
     while True:
-        stava = int( input("Koliko stavite?"))
+        stava = int(input("Koliko stavite?"))
     
-        if igra.stava(stava):
-            pass
-        else:
+        if not igra.stava(stava):
             print('Nimate toliko denarja.')
             break
         
         if model_blackjack.DENAR <= 0:
             print(izpis_poraza)
             break
-        print(izpis_igre(igra))
         
+        print(izpis_igre(igra))
+
         for karta in igra.roka1:
                 if karta.stevilo == 'A':
-                    if input('1 ali 11?>') == 11:
-                        igra.soft_hand(igra.roka1)
+                    soft_hand = int(input('1 ali 11?>'))
+                    if soft_hand == int(11):
+                        igra.soft_hand()
+                        print('******soft hand')
+                        continue
                     else:
                         pass
+        
         print(izpis_igre(igra))
 
         poteza = input("hit ali stand?")
-        
-        while poteza == 'hit':
-            igra.hit(igra.roka1)
-            i = 2
-            print(izpis_igre(igra))
-            for karta in igra.roka1[i:]:
-                if karta.stevilo == 'A':
-                    if input('1 ali 11?>') == 11:                            
-                        igra.soft_hand(igra.roka1)
-                    else:
-                        pass
+        if poteza == 'hit':
+            while poteza == 'hit':
+                igra.hit(igra.roka1)
+                i = 3
+                #print(trenutno_stanje(igra))
+                for karta in igra.roka1[i:]:
+                    if karta.stevilo == 'A':
+                        soft_hand = int(input('1 ali 11>'))
+                        if soft_hand == int(11):                            
+                            igra.soft_hand()
+                            print('******soft hand')
+                            #print(trenutno_stanje(igra))
+                            continue
+                        else:
+                            pass
+                    i+=1
+                if igra.doloci_vrednost_roke(igra.roka1) < 21:
+                    print(f'V roki imate {igra.roka1} in vrednost tega je {igra.doloci_vrednost_roke(igra.roka1)}')
+                    poteza = input("hit ali stand?")
+                    if poteza == 'stand':
+                        continue
+                if igra.doloci_vrednost_roke(igra.roka1) == 21:
+                    continue
 
-            if igra.doloci_vrednost_roke(igra.roka1) < 21:
-                print(f'V roki imate {igra.roka1} in vrednost tega je {igra.doloci_vrednost_roke(igra.roka1)}')
-                i+=1
-                poteza = input("hit ali stand?")
-                if poteza == 'stand':
+                elif igra.doloci_vrednost_roke(igra.roka1) > 21:
                     break
 
-            elif igra.doloci_vrednost_roke(igra.roka1) > 21:
-                break
-
-        if poteza == 'stand':
+        elif poteza == 'stand':
             pass
+        else:
+            break
         
         igra.dealers_play()
         
@@ -106,7 +118,6 @@ def pozeni_vmesnik():
             if odg.lower() == 'ja' or odg.lower() == 'da':
                 igra.reset()
                 igra.deal()
-                continue
             else:
                 print(izpis_poslovila(igra))
                 break
@@ -116,13 +127,10 @@ def pozeni_vmesnik():
             if odg.lower() == 'ja' or odg.lower() == 'da':
                 igra.reset()
                 igra.deal()
-                continue
             else:
                 print(izpis_poslovila(igra))
                 break
-        break
     return None
-
 
 pozeni_vmesnik()
 
