@@ -81,7 +81,7 @@ class Igra:
             if s.stevilo == 'A':
                 self.roka1[i] = Karta(barva=s.barva,stevilo = 11)
                 #print('menjam as za 11')
-            return self.roka1
+        return self.roka1
 
     def dealers_play(self):
         while self.doloci_vrednost_roke(self.dealer) <= 17:

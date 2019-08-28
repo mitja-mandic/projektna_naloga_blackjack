@@ -75,7 +75,6 @@ def pozeni_vmesnik():
                         soft_hand = int(input('1 ali 11>'))
                         if soft_hand == int(11):                            
                             igra.soft_hand()
-                            print('******soft hand')
                             #print(trenutno_stanje(igra))
                             continue
                         else:
@@ -85,9 +84,9 @@ def pozeni_vmesnik():
                     print(f'V roki imate {igra.roka1} in vrednost tega je {igra.doloci_vrednost_roke(igra.roka1)}')
                     poteza = input("hit ali stand?")
                     if poteza == 'stand':
-                        continue
+                        break
                 if igra.doloci_vrednost_roke(igra.roka1) == 21:
-                    continue
+                    break
 
                 elif igra.doloci_vrednost_roke(igra.roka1) > 21:
                     break
