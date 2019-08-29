@@ -31,6 +31,8 @@ class Igra:
     def __init__(self):
         self.dealer = []
         self.roka1 = []
+        self.roka2 = []
+        self.roke = [self.roka1, self.roka2]
         self.znesek = 0
         self.vrednost_roke = 0
         self.kup = Kup().zmešaj()
@@ -38,27 +40,34 @@ class Igra:
     def stava(self, znesek):
         global DENAR
         if znesek <= DENAR and znesek != 0:
-            
             self.znesek += znesek
             return True
         else:
             return False 
 
-    def deal(self):
+    def deal(self, roka):
         že_podeljene = []    
-        
         if self.stava:
             for karta in self.kup:
-                if len(self.roka1) < 2 and karta not in že_podeljene :
-                    self.roka1.append(karta)
+                if len(roka) < 2 and karta not in že_podeljene :
+                    roka.append(karta)
                     že_podeljene.append(karta)
-                elif karta not in self.roka1 and karta not in že_podeljene and len(self.dealer) < 2:
+                elif karta not in roka and karta not in že_podeljene and len(self.dealer) < 2:
                     self.dealer.append(karta)
                     že_podeljene.append(karta)
                 else:
                     continue
+        
         for karta in že_podeljene:
             self.kup.remove(karta)
+    
+    def deal_split(self):
+        if self.split():
+            for roka in self.roke:
+                self.deal(roka)
+        else:
+            pass
+
         
     def hit(self, igralec):
         if self.stava:
@@ -81,18 +90,17 @@ class Igra:
             if s.stevilo == 'A':
                 self.roka1[i] = Karta(barva=s.barva,stevilo = 11)
                 #print('menjam as za 11')
-        return self.roka1
+            return self.roka1
 
     def dealers_play(self):
         while self.doloci_vrednost_roke(self.dealer) <= 17:
             self.dealer.append(self.kup[0])
             self.kup.remove(self.dealer[-1])
 
-    #def igra_igralca(self):
-    #    self.roka1.hit(roka1)
-    #    self.konec_igre()
-
-
+    def split(self):
+        if self.roka1[0].stevilo == self.roka1[1].stevilo:
+            self.roka2.append(self.roka1[1])
+            self.roka1.pop()
 
     def konec_igre(self):
         global DENAR
@@ -129,17 +137,16 @@ class Igra:
         self.dealer = []
         self.roka1 = []
         self.kup = Kup().zmešaj()
-        self.deal()
+        self.deal(self.roka1)
     def __repr__(self):
-        return f'{self.roka1}, {self.doloci_vrednost_roke(self.roka1)}'
+        return f'{self.roka1}, {self.doloci_vrednost_roke(self.roka1)}, {self.roka2},{self.roke}'
     #return f'{self.roka1},{self.dealer},{self.doloci_vrednost_roke(self.roka1)},{self.doloci_vrednost_roke(self.dealer)}'
 
-#m = Igra()
-#m.deal()
-#print(m)
-#m.soft_hand()
-#print(m)
-
+m = Igra()
+m.deal(m.roka1)
+print(repr(m))
+m.split()
+print(repr(m))
 
 def nova_igra():
     return Igra()
