@@ -3,6 +3,9 @@ lojtrice = "######################################\n"
 
 
 
+def začetek():
+    tekst = lojtrice + 'Pozdravljeni! Začenjate igro blackjacka. Imate 100 žetonov, stava je obvezna, ni pa spodnje meje.\nVsak krog morate staviti. Srečno!\n'
+    return tekst
 
 
 def izpis_zmage(igra):
@@ -19,7 +22,7 @@ def izpis_igre(igra):
     return tekst
 
 def izpis_poslovila(igra):
-    tekst = lojtrice + 'Hvala da ste igrali pri nas.'
+    tekst = lojtrice + f'Začeli ste s 100 žetoni, sedaj jih imate {model_blackjack.DENAR}. Hvala da ste igrali pri nas.'
     return tekst
 
 def izpis_poraz_runde(igra):
@@ -31,6 +34,11 @@ def izpis_zmage_runde(igra):
     tekst = lojtrice + 'Čestitamo, ta krog ste zmagali. V roki ste imeli {0},\ndealer pa {1}. Na računu imate sedaj {2}.'.format(igra.roke, igra.dealer, model_blackjack.DENAR)
     tekst += '\n' + lojtrice
     return tekst
+
+def izpis_push(igra):
+    tekst = lojtrice + 'Imate enako kot dealer. Denar se vam vrne.'
+    return tekst
+
 
 def trenutno_stanje(igra):
     tekst = lojtrice + f'V roki imate {igra.roke}.'
@@ -54,14 +62,15 @@ def igra_hit(igra, roka):
                 vprasanje = input('hit ali stand?')
 
 def pozeni_vmesnik():
+    print(začetek())
     igra = model_blackjack.nova_igra()
     igra.deal(igra.roke[0])
-    while True:
-        
+    
+    while True:  
         stava = int(input("Koliko stavite?"))
         if not igra.stava(stava):
             print('Nimate toliko denarja.')
-            break
+            stava = int(input("Lahko stavite manj, ali pritisnete enter za izhod. Koliko stavite?"))
         if model_blackjack.DENAR < 0:
             print(izpis_poraza(igra))
             break
@@ -72,9 +81,10 @@ def pozeni_vmesnik():
             split = input('split? s tem tudi podvojite svojo stavo.')
             if split == 'ja':
                 igra.split()
+                print(izpis_igre(igra))
             else:
                 pass
-        print(izpis_igre(igra))
+        
 
         for roka in igra.roke:
             if roka != []:
@@ -121,7 +131,7 @@ def pozeni_vmesnik():
                 print(izpis_poslovila(igra))
                 break
         elif igra.preveri_konec() == model_blackjack.PUSH:
-            print('Imate enako kot dealer, denar se vam vrne.')
+            print(izpis_push(igra))
             odg = input('Ali želite igrati naprej?')
             if odg.lower() == 'ja' or odg.lower() == 'da':
                 igra.reset()

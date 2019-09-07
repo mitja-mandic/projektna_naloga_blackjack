@@ -44,11 +44,11 @@ class Igra:
             self.znesek += znesek
             return True
         else:
-            return False 
+            return False
 
     def deal(self, roka):
         že_podeljene = []    
-        #if self.stava:
+        
         for karta in self.kup:
             if len(roka) < 2 and karta not in že_podeljene :
                 roka.append(karta)
@@ -62,10 +62,9 @@ class Igra:
         for karta in že_podeljene:
             self.kup.remove(karta)
         
-    def hit(self, igralec):
-        if self.stava:    
-            igralec.append(self.kup[0])
-            self.kup.remove(igralec[-1])
+    def hit(self, igralec):   
+        igralec.append(self.kup[0])
+        self.kup.remove(igralec[-1])
 
     def doloci_vrednost_roke(self, igralec):    
         self.vrednost_roke = 0
@@ -140,19 +139,19 @@ class Igra:
         self.deal(self.roka1)
     
     def preveri_konec(self):
-        rezultati = []
+        rezultati = 0
         for roka in self.roke:
             if roka != []:
                 if self.konec_igre(roka) == PUSH:
-                    rezultati.append(0)                
+                    pass                
                 elif self.konec_igre(roka) == ZMAGA_RUNDE:
-                    rezultati.append(1)
+                    rezultati += 2
                 elif self.konec_igre(roka) == PORAZ_RUNDE:
-                    rezultati.append(-2)
+                    rezultati += -1
 
-        if sum(rezultati) == 0:
+        if rezultati == 0:
             return PUSH
-        elif sum(rezultati) < 0:
+        elif rezultati < 0:
             return PORAZ_RUNDE
         else:
             return ZMAGA_RUNDE
