@@ -17,8 +17,8 @@ def izpis_poraza(igra):
     return tekst
 
 def izpis_igre(igra):
-    tekst = lojtrice + ('''V roki imate {0} in vsota vrednosti vaših kart je {1} \ndealer ima v roki 
-    {2} \n imate še {3} žetonov, stavili ste {4}.''').format(igra.roke, igra.doloci_vrednost_roke(igra.roke[0]), igra.dealer[:-1], model_blackjack.DENAR, igra.znesek)
+    tekst = lojtrice + ('''V roki imate {0} in vsota vrednosti vaših kart je {1},\ndealer ima v roki {2}.
+    \nImate še {3} žetonov, stavili ste {4}.\n''').format(igra.roke, igra.doloci_vrednost_roke(igra.roke[0]), igra.dealer[:-1], model_blackjack.DENAR, igra.znesek)
     return tekst
 
 def izpis_poslovila(igra):
@@ -40,26 +40,25 @@ def izpis_push(igra):
     return tekst
 
 
-def trenutno_stanje(igra):
-    tekst = lojtrice + f'V roki imate {igra.roke}.'
+def trenutno_stanje(igra, roka):
+    tekst = lojtrice + f'V roki imate {igra.roke}. Vrednost tega je {igra.doloci_vrednost_roke(roka)}'
     return tekst
 
 def igra_hit(igra, roka):
-    if igra.doloci_vrednost_roke(roka) < 21:
-        vprasanje = input('hit ali stand?')
-        while True:
-            if vprasanje == 'stand':
-                break
-            elif vprasanje == 'hit':
-                igra.hit(roka)
-                print(trenutno_stanje(igra))
-                print(f'Vrednost roke je {igra.doloci_vrednost_roke(roka)}.')
-                if igra.doloci_vrednost_roke(roka) < 21:
-                    vprasanje = input('hit ali stand?')
-                else:
-                    break
+    vprasanje = input('Hit ali stand? ')
+    while True:
+        if vprasanje.lower() == 'stand':   
+            break
+        elif vprasanje.lower() == 'hit':
+            igra.hit(roka)
+            print(trenutno_stanje(igra, roka))
+            if igra.doloci_vrednost_roke(roka) < 21:
+                vprasanje = input('Hit ali stand? ')
             else:
-                vprasanje = input('hit ali stand?')
+                break
+        else:
+            vprasanje = input('Hit ali stand? ')
+    
 
 def pozeni_vmesnik():
     print(začetek())
@@ -67,10 +66,14 @@ def pozeni_vmesnik():
     igra.deal(igra.roke[0])
     
     while True:  
-        stava = int(input("Koliko stavite?"))
-        if not igra.stava(stava):
+        stava = input("Koliko stavite? ")
+        for znak in stava:
+            if znak not in [str(x) for x in range(10)]:
+                stava = input("Prosim ponovno vpišite stavo.")
+        
+        if not igra.stava(int(stava)):
             print('Nimate toliko denarja.')
-            stava = int(input("Lahko stavite manj, ali pritisnete enter za izhod. Koliko stavite?"))
+            stava = int(input("Lahko stavite manj, ali pritisnete enter za izhod. Koliko stavite? "))
         if model_blackjack.DENAR < 0:
             print(izpis_poraza(igra))
             break
@@ -78,16 +81,19 @@ def pozeni_vmesnik():
         print(izpis_igre(igra))
 
         if igra.roka1[0].stevilo == igra.roka1[1].stevilo:
-            split = input('split? s tem tudi podvojite svojo stavo.')
-            if split == 'ja':
+            split = input('Split? s tem tudi podvojite svojo stavo. ')
+            if split.lower() == 'ja' or split.lower() == 'da':
                 igra.split()
                 print(izpis_igre(igra))
             else:
                 pass
-        
-
+    
         for roka in igra.roke:
+            i = 0
             if roka != []:
+                if i == 1:
+                    print('Sedaj igrate še drugo roko.')
+                i+= 1
                 igra_hit(igra, roka)
             else:
                 break
@@ -116,28 +122,34 @@ def pozeni_vmesnik():
         
         elif igra.preveri_konec() == model_blackjack.PORAZ_RUNDE:
             print(izpis_poraz_runde(igra))
-            odg = input('Ali želite igrati naprej?')
+            odg = input('Ali želite igrati naprej? ')
             if odg.lower() == 'ja' or odg.lower() == 'da':
                 igra.reset()
-            else:
+            elif odg.lower() == 'ne':
                 print(izpis_poslovila(igra))
                 break
+            else:
+                odg = input('Ali želite igrati naprej? ')
         elif igra.preveri_konec() == model_blackjack.ZMAGA_RUNDE:
             print(izpis_zmage_runde(igra))
-            odg = input('Ali želite igrati naprej?')
+            odg = input('Ali želite igrati naprej? ')
             if odg.lower() == 'ja' or odg.lower() == 'da':
                 igra.reset()
-            else:
+            elif odg.lower() == 'ne':
                 print(izpis_poslovila(igra))
                 break
+            else:
+                odg = input('Ali želite igrati naprej? ')
         elif igra.preveri_konec() == model_blackjack.PUSH:
             print(izpis_push(igra))
-            odg = input('Ali želite igrati naprej?')
+            odg = input('Ali želite igrati naprej? ')
             if odg.lower() == 'ja' or odg.lower() == 'da':
                 igra.reset()
-            else:
+            elif odg.lower() == 'ne':
                 print(izpis_poslovila(igra))
                 break
+            else:
+                odg = input('Ali želite igrati naprej? ')
     return None
 
 pozeni_vmesnik()
