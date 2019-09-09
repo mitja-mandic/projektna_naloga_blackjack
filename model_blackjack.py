@@ -25,7 +25,6 @@ class Kup:
     def __repr__(self):
         return f'{self.kup}'
 
-
 class Igra:
     def __init__(self):
         self.dealer = []
@@ -98,7 +97,6 @@ class Igra:
             self.deal(roka)
         return True
 
-
     def konec_igre(self, roka):
         if self.denar < 0:
             return PORAZ
@@ -118,6 +116,7 @@ class Igra:
             return PORAZ_RUNDE
         if (self.doloci_vrednost_roke(self.dealer) < 21) and (self.doloci_vrednost_roke(roka) < 21) and (self.doloci_vrednost_roke(roka) > self.doloci_vrednost_roke(self.dealer)):
             return ZMAGA_RUNDE
+    
     def uredi_denar(self):
         konec = self.preveri_konec()
         if konec == ZMAGA_RUNDE:
@@ -127,8 +126,6 @@ class Igra:
         else:
             pass
         self.znesek = 0
-
-
 
     def reset(self):
         self.dealer = []
@@ -157,18 +154,6 @@ class Igra:
             return PORAZ_RUNDE
         else:
             return ZMAGA_RUNDE
-    
-    
-    
-    def __repr__(self):
-        return f'{self.roka1},{self.roka2},{self.roke}'
-    #return f'{self.roka1},{self.dealer},{self.doloci_vrednost_roke(self.roka1)},{self.doloci_vrednost_roke(self.dealer)}'
-
-#m = Igra()
-#m.deal(m.roka1)
-#print(repr(m))
-#m.split()
-#print(repr(m))
 
 
 
