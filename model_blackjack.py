@@ -1,5 +1,4 @@
 import random
-DENAR = 100   
 BARVE = ['Srca', 'Kara', 'Pik', 'Križ']
 ZMAGA = 'wW'
 PORAZ = 'xx'
@@ -19,7 +18,7 @@ class Kup:
         self.kup = None
     
     def zmešaj(self):
-        self.kup = [Karta(barva, stevilo) for barva in BARVE for stevilo in [2,3,4,5,6,7,8,9,10,'J','Q','K','A']]
+        self.kup = [Karta(barva, stevilo) for barva in BARVE for stevilo in [2,3,4,5,6,7,8,9,10,'J','Q','K','A']] * 4
         random.shuffle(self.kup)
         return self.kup
     
@@ -36,11 +35,11 @@ class Igra:
         self.znesek = 0
         self.vrednost_roke = 0
         self.kup = Kup().zmešaj()
+        self.denar = 100
     
-    def stava(self, znesek):
-        global DENAR
-        if znesek <= DENAR and znesek != 0:
-            DENAR -= znesek
+    def stava(self, znesek):   
+        if znesek <= self.denar and znesek != 0:
+            self.denar -= znesek
             self.znesek += znesek
             return True
         else:
@@ -84,52 +83,53 @@ class Igra:
                 return roka
 
     def dealers_play(self):
-        while self.doloci_vrednost_roke(self.dealer) <= 17:
+        while self.doloci_vrednost_roke(self.dealer) < 17:
             self.dealer.append(self.kup[0])
             self.kup.remove(self.dealer[-1])
 
     def split(self):
-    
+        if (self.znesek * 2) <= self.denar:
+            self.znesek += self.znesek * 2
+        else:
+            self.znesek += self.denar
         self.roka2.append(self.roka1[1])
         self.roka1.pop()
-        self.znesek *= 2
         for roka in self.roke:
             self.deal(roka)
         return True
 
 
     def konec_igre(self, roka):
-        global DENAR
-        if DENAR <= 0:
+        if self.denar < 0:
             return PORAZ
-        elif DENAR == 300:
+        if self.denar == 300:
             return ZMAGA
-        elif (self.doloci_vrednost_roke(self.dealer) < 21) and (self.doloci_vrednost_roke(roka) < 21) and self.doloci_vrednost_roke(roka) == self.doloci_vrednost_roke(self.dealer):
-            DENAR += self.znesek
-            self.znesek = 0
+        if (self.doloci_vrednost_roke(self.dealer) < 21) and (self.doloci_vrednost_roke(roka) < 21) and self.doloci_vrednost_roke(roka) == self.doloci_vrednost_roke(self.dealer):
             return PUSH
-        elif self.doloci_vrednost_roke(roka) > 21:
-            self.znesek = 0
+        if self.doloci_vrednost_roke(roka) > 21:
             return PORAZ_RUNDE
-        elif self.doloci_vrednost_roke(roka) == 21:
-            DENAR += 2 * self.znesek
-            self.znesek = 0
+        if self.doloci_vrednost_roke(roka) == 21:
             return ZMAGA_RUNDE
-        elif self.doloci_vrednost_roke(self.dealer) == 21:
-            self.znesek = 0
+        if self.doloci_vrednost_roke(self.dealer) == 21:
             return PORAZ_RUNDE
-        elif self.doloci_vrednost_roke(self.dealer) > 21: 
-            DENAR += 2 * self.znesek
-            self.znesek = 0
+        if self.doloci_vrednost_roke(self.dealer) > 21: 
             return ZMAGA_RUNDE
-        elif (self.doloci_vrednost_roke(self.dealer) < 21) and (self.doloci_vrednost_roke(roka) < 21) and (self.doloci_vrednost_roke(roka) < self.doloci_vrednost_roke(self.dealer)):
-            self.znesek = 0
+        if (self.doloci_vrednost_roke(self.dealer) < 21) and (self.doloci_vrednost_roke(roka) < 21) and (self.doloci_vrednost_roke(roka) < self.doloci_vrednost_roke(self.dealer)):
             return PORAZ_RUNDE
-        elif (self.doloci_vrednost_roke(self.dealer) < 21) and (self.doloci_vrednost_roke(roka) < 21) and (self.doloci_vrednost_roke(roka) > self.doloci_vrednost_roke(self.dealer)):
-            DENAR += 2 * self.znesek
-            self.znesek = 0
+        if (self.doloci_vrednost_roke(self.dealer) < 21) and (self.doloci_vrednost_roke(roka) < 21) and (self.doloci_vrednost_roke(roka) > self.doloci_vrednost_roke(self.dealer)):
             return ZMAGA_RUNDE
-        
+    def uredi_denar(self):
+        konec = self.preveri_konec()
+        if konec == ZMAGA_RUNDE:
+            self.denar += 2 * self.znesek
+        elif konec == PUSH:
+            self.denar += self.znesek
+        else:
+            pass
+        self.znesek = 0
+
+
+
     def reset(self):
         self.dealer = []
         self.roka1 = []
@@ -142,13 +142,15 @@ class Igra:
         rezultati = 0
         for roka in self.roke:
             if roka != []:
-                if self.konec_igre(roka) == PUSH:
+                konec = self.konec_igre(roka)
+                if konec == PUSH:
                     pass                
-                elif self.konec_igre(roka) == ZMAGA_RUNDE:
+                elif konec == ZMAGA_RUNDE:
                     rezultati += 2
-                elif self.konec_igre(roka) == PORAZ_RUNDE:
-                    rezultati += -1
-
+                elif konec == PORAZ_RUNDE:
+                    rezultati -= 1
+        if self.denar < 0:
+            return PORAZ
         if rezultati == 0:
             return PUSH
         elif rezultati < 0:
